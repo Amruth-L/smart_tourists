@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+db.sqlite3
+*.pyc
+
+venv/
+
+backend/venv/
+frontend/.venv/
+
+# Environment variables
+.env
+

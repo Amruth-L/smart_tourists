@@ -1,17 +1,19 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import api from "../api";
+import Card from "../components/Card";
 
-export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp }) {
-  const [activeTab, setActiveTab] = useState("login"); // "login" or "register"
-  const [userType, setUserType] = useState("tourist"); // "tourist" or "authority"
+export default function Auth() {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("login");
+  const [userType, setUserType] = useState("tourist");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Tourist Registration Form State
   const [touristReg, setTouristReg] = useState({
     fullName: "",
     email: "",
@@ -23,14 +25,12 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
     termsAccepted: false,
   });
 
-  // Tourist Login Form State
   const [touristLogin, setTouristLogin] = useState({
     email: "",
     password: "",
     rememberMe: false,
   });
 
-  // Authority Registration Form State
   const [authorityReg, setAuthorityReg] = useState({
     fullName: "",
     officialEmail: "",
@@ -41,13 +41,11 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
     authorityId: "",
   });
 
-  // Authority Login Form State
   const [authorityLogin, setAuthorityLogin] = useState({
     officialEmail: "",
     password: "",
   });
 
-  // Profile photo preview
   const [photoPreview, setPhotoPreview] = useState(null);
 
   const handlePhotoChange = (e) => {
@@ -164,12 +162,11 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
       });
 
       setSuccess("Registration complete! Welcome to the Tourist Safety Portal.");
-      // Store user ID and redirect to profile detail
-      if (response.data.user_id && setUserId) {
-        setUserId(response.data.user_id);
-        if (setUserTypeProp) setUserTypeProp("tourist");
+      if (response.data.user_id) {
+        localStorage.setItem("userId", response.data.user_id);
+        localStorage.setItem("userType", "tourist");
         setTimeout(() => {
-          setRoute("tourist-profile");
+          navigate("/tourist-profile");
         }, 2000);
       } else {
         setTimeout(() => {
@@ -206,18 +203,15 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
       });
 
       setSuccess("Login successful! Redirecting...");
-      // Store token if provided
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("userType", "tourist");
       }
-      // Store user ID
-      if (response.data.user?.id && setUserId) {
-        setUserId(response.data.user.id);
-        if (setUserTypeProp) setUserTypeProp("tourist");
+      if (response.data.user?.id) {
+        localStorage.setItem("userId", response.data.user.id);
       }
       setTimeout(() => {
-        setRoute("dashboard");
+        navigate("/dashboard");
       }, 1500);
     } catch (err) {
       setError(
@@ -253,12 +247,11 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
       setSuccess(
         "Access request submitted. Your details will be verified by an administrator shortly."
       );
-      // Store user ID and redirect to profile detail
-      if (response.data.user_id && setUserId) {
-        setUserId(response.data.user_id);
-        if (setUserTypeProp) setUserTypeProp("authority");
+      if (response.data.user_id) {
+        localStorage.setItem("userId", response.data.user_id);
+        localStorage.setItem("userType", "authority");
         setTimeout(() => {
-          setRoute("authority-profile");
+          navigate("/authority-profile");
         }, 2000);
       } else {
         setTimeout(() => {
@@ -299,13 +292,11 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("userType", "authority");
       }
-      // Store user ID
-      if (response.data.user?.id && setUserId) {
-        setUserId(response.data.user.id);
-        if (setUserTypeProp) setUserTypeProp("authority");
+      if (response.data.user?.id) {
+        localStorage.setItem("userId", response.data.user.id);
       }
       setTimeout(() => {
-        setRoute("dashboard");
+        navigate("/dashboard");
       }, 1500);
     } catch (err) {
       setError(
@@ -319,61 +310,41 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
   };
 
   const nationalities = [
-    "United States",
-    "United Kingdom",
-    "Canada",
-    "Australia",
-    "Germany",
-    "France",
-    "Italy",
-    "Spain",
-    "Japan",
-    "China",
-    "India",
-    "Brazil",
-    "Mexico",
-    "Other",
+    "United States", "United Kingdom", "Canada", "Australia", "Germany",
+    "France", "Italy", "Spain", "Japan", "China", "India", "Brazil", "Mexico", "Other",
   ];
 
   const agencyTypes = [
-    "Police",
-    "Hospital/Medical",
-    "Embassy",
-    "Fire Department",
-    "Tourism Authority",
-    "Emergency Services",
-    "Other",
+    "Police", "Hospital/Medical", "Embassy", "Fire Department",
+    "Tourism Authority", "Emergency Services", "Other",
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center py-12 px-4">
-      <div className="w-full max-w-6xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-2">
-            Tourist Safety Portal
-          </h1>
-          <p className="text-gray-400">Secure Authentication</p>
-        </div>
-
-        {/* Main Auth Card */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center py-12 px-4">
+      <div className="w-full max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gray-900 rounded-2xl shadow-2xl overflow-hidden"
+          className="text-center mb-8"
         >
-          {/* Tabs */}
-          <div className="flex border-b border-gray-700">
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            Tourist Safety Portal
+          </h1>
+          <p className="text-gray-600">Secure Authentication</p>
+        </motion.div>
+
+        <Card className="shadow-xl">
+          <div className="flex border-b border-gray-200 mb-6">
             <button
               onClick={() => {
                 setActiveTab("login");
                 setError("");
                 setSuccess("");
               }}
-              className={`flex-1 py-4 px-6 font-semibold transition-colors ${
+              className={`flex-1 py-4 px-6 font-semibold transition-colors rounded-t-lg ${
                 activeTab === "login"
                   ? "bg-blue-600 text-white"
-                  : "text-gray-400 hover:text-white hover:bg-gray-800"
+                  : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
               }`}
             >
               Login
@@ -384,18 +355,17 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                 setError("");
                 setSuccess("");
               }}
-              className={`flex-1 py-4 px-6 font-semibold transition-colors ${
+              className={`flex-1 py-4 px-6 font-semibold transition-colors rounded-t-lg ${
                 activeTab === "register"
                   ? "bg-blue-600 text-white"
-                  : "text-gray-400 hover:text-white hover:bg-gray-800"
+                  : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
               }`}
             >
               Register
             </button>
           </div>
 
-          {/* User Type Selection */}
-          <div className="p-6 border-b border-gray-700">
+          <div className="p-6 border-b border-gray-200 mb-6">
             <div className="flex gap-4 justify-center">
               <button
                 onClick={() => {
@@ -405,8 +375,8 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                 }}
                 className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
                   userType === "tourist"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
                 Tourist
@@ -419,8 +389,8 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                 }}
                 className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
                   userType === "authority"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
                 Authority
@@ -428,15 +398,14 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
             </div>
           </div>
 
-          {/* Forms */}
-          <div className="p-8">
+          <div className="p-6">
             <AnimatePresence mode="wait">
               {error && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="mb-6 p-4 bg-red-900/50 border border-red-600 rounded-lg text-red-200"
+                  className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg text-red-700"
                 >
                   {error}
                 </motion.div>
@@ -447,14 +416,13 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="mb-6 p-4 bg-green-900/50 border border-green-600 rounded-lg text-green-200"
+                  className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-lg text-green-700"
                 >
                   {success}
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Tourist Login */}
             {activeTab === "login" && userType === "tourist" && (
               <motion.form
                 key="tourist-login"
@@ -465,7 +433,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                 className="space-y-6"
               >
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
                     Email Address
                   </label>
                   <input
@@ -474,14 +442,14 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                     onChange={(e) =>
                       setTouristLogin({ ...touristLogin, email: e.target.value })
                     }
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                     placeholder="your.email@example.com"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
                     Password
                   </label>
                   <div className="relative">
@@ -494,14 +462,14 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                           password: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white pr-12"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 pr-12"
                       placeholder="Enter your password"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                     >
                       {showPassword ? "Hide" : "Show"}
                     </button>
@@ -521,12 +489,9 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                       }
                       className="mr-2"
                     />
-                    <span className="text-sm">Remember Me</span>
+                    <span className="text-sm text-gray-600">Remember Me</span>
                   </label>
-                  <a
-                    href="#"
-                    className="text-sm text-blue-400 hover:text-blue-300"
-                  >
+                  <a href="#" className="text-sm text-blue-600 hover:text-blue-700">
                     Forgot Password?
                   </a>
                 </div>
@@ -534,14 +499,13 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                 >
                   {loading ? "Logging in..." : "Login to Safety Portal"}
                 </button>
               </motion.form>
             )}
 
-            {/* Tourist Registration */}
             {activeTab === "register" && userType === "tourist" && (
               <motion.form
                 key="tourist-register"
@@ -552,7 +516,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                 className="space-y-6"
               >
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
                     Full Name *
                   </label>
                   <input
@@ -561,14 +525,14 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                     onChange={(e) =>
                       setTouristReg({ ...touristReg, fullName: e.target.value })
                     }
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                     placeholder="John Doe"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
                     Email Address (Username) *
                   </label>
                   <input
@@ -577,7 +541,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                     onChange={(e) =>
                       setTouristReg({ ...touristReg, email: e.target.value })
                     }
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                     placeholder="your.email@example.com"
                     required
                   />
@@ -585,7 +549,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">
+                    <label className="block text-sm font-medium mb-2 text-gray-700">
                       Password (Min. 8 characters) *
                     </label>
                     <div className="relative">
@@ -598,7 +562,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                             password: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white pr-12"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 pr-12"
                         placeholder="Enter password"
                         required
                         minLength={8}
@@ -606,7 +570,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                       >
                         {showPassword ? "Hide" : "Show"}
                       </button>
@@ -614,7 +578,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">
+                    <label className="block text-sm font-medium mb-2 text-gray-700">
                       Confirm Password *
                     </label>
                     <div className="relative">
@@ -627,7 +591,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                             confirmPassword: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white pr-12"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 pr-12"
                         placeholder="Confirm password"
                         required
                       />
@@ -636,7 +600,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                         onClick={() =>
                           setShowConfirmPassword(!showConfirmPassword)
                         }
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                       >
                         {showConfirmPassword ? "Hide" : "Show"}
                       </button>
@@ -645,7 +609,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
                     Nationality *
                   </label>
                   <select
@@ -653,7 +617,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                     onChange={(e) =>
                       setTouristReg({ ...touristReg, nationality: e.target.value })
                     }
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                     required
                   >
                     <option value="">Select Nationality</option>
@@ -666,7 +630,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
                     Current Location / Travel Status *
                   </label>
                   <input
@@ -678,23 +642,22 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                         currentLocation: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                     placeholder="e.g., Paris, France"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
                     Upload Profile Photo * (Mandatory)
                   </label>
-                  <p className="text-sm text-gray-400 mb-3">
-                    Your photo is crucial for emergency verification and
-                    identification.
+                  <p className="text-sm text-gray-500 mb-3">
+                    Your photo is crucial for emergency verification and identification.
                   </p>
                   <div className="flex items-center gap-4">
-                    <label className="cursor-pointer bg-gray-800 border border-gray-700 rounded-lg px-6 py-3 hover:bg-gray-700 transition-colors">
-                      <span className="text-white">Choose File</span>
+                    <label className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 py-3 transition-colors">
+                      <span>Choose File</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -704,17 +667,15 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                       />
                     </label>
                     {photoPreview && (
-                      <div className="relative">
-                        <img
-                          src={photoPreview}
-                          alt="Preview"
-                          className="w-20 h-20 rounded-lg object-cover border border-gray-700"
-                        />
-                      </div>
+                      <img
+                        src={photoPreview}
+                        alt="Preview"
+                        className="w-20 h-20 rounded-lg object-cover border border-gray-300"
+                      />
                     )}
                   </div>
                   {touristReg.profilePhoto && (
-                    <p className="text-sm text-green-400 mt-2">
+                    <p className="text-sm text-green-600 mt-2">
                       ✓ Photo selected: {touristReg.profilePhoto.name}
                     </p>
                   )}
@@ -734,9 +695,9 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                       className="mt-1 mr-2"
                       required
                     />
-                    <span className="text-sm">
+                    <span className="text-sm text-gray-600">
                       I accept the{" "}
-                      <a href="#" className="text-blue-400 hover:text-blue-300">
+                      <a href="#" className="text-blue-600 hover:text-blue-700">
                         Terms & Conditions
                       </a>{" "}
                       *
@@ -747,14 +708,13 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                 >
                   {loading ? "Registering..." : "Register Safely"}
                 </button>
               </motion.form>
             )}
 
-            {/* Authority Login */}
             {activeTab === "login" && userType === "authority" && (
               <motion.form
                 key="authority-login"
@@ -765,7 +725,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                 className="space-y-6"
               >
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
                     Official Email
                   </label>
                   <input
@@ -777,14 +737,14 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                         officialEmail: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                     placeholder="officer@police.gov"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
                     Password
                   </label>
                   <input
@@ -796,17 +756,14 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                         password: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                     placeholder="Enter your password"
                     required
                   />
                 </div>
 
                 <div className="text-right">
-                  <a
-                    href="#"
-                    className="text-sm text-blue-400 hover:text-blue-300"
-                  >
+                  <a href="#" className="text-sm text-blue-600 hover:text-blue-700">
                     Forgot Password?
                   </a>
                 </div>
@@ -814,14 +771,13 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                 >
                   {loading ? "Logging in..." : "Authority Login"}
                 </button>
               </motion.form>
             )}
 
-            {/* Authority Registration */}
             {activeTab === "register" && userType === "authority" && (
               <motion.form
                 key="authority-register"
@@ -832,7 +788,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                 className="space-y-6"
               >
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
                     Full Name *
                   </label>
                   <input
@@ -844,14 +800,14 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                         fullName: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                     placeholder="John Smith"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
                     Official Email (Username) *
                   </label>
                   <input
@@ -863,18 +819,18 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                         officialEmail: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                     placeholder="officer@police.gov"
                     required
                   />
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-gray-500 mt-1">
                     Must be an official email (e.g., @police.gov, @hospital.org)
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">
+                    <label className="block text-sm font-medium mb-2 text-gray-700">
                       Password (Min. 8 characters) *
                     </label>
                     <input
@@ -886,7 +842,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                           password: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                       placeholder="Enter password"
                       required
                       minLength={8}
@@ -894,7 +850,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">
+                    <label className="block text-sm font-medium mb-2 text-gray-700">
                       Confirm Password *
                     </label>
                     <input
@@ -906,7 +862,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                           confirmPassword: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                       placeholder="Confirm password"
                       required
                     />
@@ -914,7 +870,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
                     Agency Type *
                   </label>
                   <select
@@ -925,7 +881,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                         agencyType: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                     required
                   >
                     <option value="">Select Agency Type</option>
@@ -938,7 +894,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
                     Agency/Station Name *
                   </label>
                   <input
@@ -950,16 +906,15 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                         agencyName: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                     placeholder="Central Police Station"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Unique Authority ID / Badge Number * (Required for
-                    verification)
+                  <label className="block text-sm font-medium mb-2 text-gray-700">
+                    Unique Authority ID / Badge Number * (Required for verification)
                   </label>
                   <input
                     type="text"
@@ -970,7 +925,7 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                         authorityId: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                     placeholder="AUTH-12345"
                     required
                   />
@@ -979,26 +934,15 @@ export default function Auth({ setRoute, setUserId, setUserType: setUserTypeProp
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                 >
                   {loading ? "Submitting..." : "Request Authority Access"}
                 </button>
               </motion.form>
             )}
           </div>
-        </motion.div>
-
-        {/* Navigation Links */}
-        <div className="text-center mt-6">
-          <button
-            onClick={() => setRoute("home")}
-            className="text-gray-400 hover:text-white transition-colors"
-          >
-            ← Back to Portal
-          </button>
-        </div>
+        </Card>
       </div>
     </div>
   );
 }
-

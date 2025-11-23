@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api";
+import Card from "../components/Card";
 
-export default function AuthorityProfileDetail({ userId, onComplete }) {
+export default function AuthorityProfileDetail() {
+  const navigate = useNavigate();
+  const userId = localStorage.getItem('userId');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -102,7 +106,7 @@ export default function AuthorityProfileDetail({ userId, onComplete }) {
 
       setSuccess("Authority Profile saved successfully!");
       setTimeout(() => {
-        if (onComplete) onComplete();
+        navigate("/dashboard");
       }, 1500);
     } catch (err) {
       setError(
@@ -116,33 +120,33 @@ export default function AuthorityProfileDetail({ userId, onComplete }) {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gray-900 rounded-2xl shadow-2xl p-8"
         >
-          <h2 className="text-3xl font-bold mb-6 text-center">
+          <Card className="shadow-xl">
+          <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
             Authority Profile Details
           </h2>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-900/50 border border-red-600 rounded-lg text-red-200">
+            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg text-red-700">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="mb-6 p-4 bg-green-900/50 border border-green-600 rounded-lg text-green-200">
+            <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-lg text-green-700">
               {success}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Official Contact Information Section */}
-            <div className="border-b border-gray-700 pb-6">
-              <h3 className="text-xl font-semibold mb-4">
+            <div className="border-b border-gray-200 pb-6">
+              <h3 className="text-xl font-semibold mb-4 text-gray-800">
                 Official Contact Information
               </h3>
 
@@ -156,7 +160,7 @@ export default function AuthorityProfileDetail({ userId, onComplete }) {
                   onChange={(e) =>
                     setFormData({ ...formData, full_name: e.target.value })
                   }
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                   placeholder="John Smith"
                   required
                 />
@@ -175,7 +179,7 @@ export default function AuthorityProfileDetail({ userId, onComplete }) {
                       official_email: e.target.value,
                     })
                   }
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                   placeholder="officer@police.gov"
                   required
                 />
@@ -194,7 +198,7 @@ export default function AuthorityProfileDetail({ userId, onComplete }) {
                       phone_number: e.target.value,
                     })
                   }
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                   placeholder="+1234567890"
                   required
                 />
@@ -202,8 +206,8 @@ export default function AuthorityProfileDetail({ userId, onComplete }) {
             </div>
 
             {/* Security Section */}
-            <div className="border-b border-gray-700 pb-6">
-              <h3 className="text-xl font-semibold mb-4">Security (Login Details)</h3>
+            <div className="border-b border-gray-200 pb-6">
+              <h3 className="text-xl font-semibold mb-4 text-gray-800">Security (Login Details)</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -225,7 +229,7 @@ export default function AuthorityProfileDetail({ userId, onComplete }) {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                     >
                       {showPassword ? "Hide" : "Show"}
                     </button>
@@ -255,7 +259,7 @@ export default function AuthorityProfileDetail({ userId, onComplete }) {
                       onClick={() =>
                         setShowConfirmPassword(!showConfirmPassword)
                       }
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                     >
                       {showConfirmPassword ? "Hide" : "Show"}
                     </button>
@@ -266,7 +270,7 @@ export default function AuthorityProfileDetail({ userId, onComplete }) {
 
             {/* Identification Section */}
             <div className="pb-6">
-              <h3 className="text-xl font-semibold mb-4">Identification</h3>
+              <h3 className="text-xl font-semibold mb-4 text-gray-800">Identification</h3>
 
               <div>
                 <label className="block text-sm font-medium mb-2">
@@ -278,7 +282,7 @@ export default function AuthorityProfileDetail({ userId, onComplete }) {
                   onChange={(e) =>
                     setFormData({ ...formData, officer_id: e.target.value })
                   }
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
                   placeholder="AUTH-12345"
                   required
                 />
@@ -288,11 +292,12 @@ export default function AuthorityProfileDetail({ userId, onComplete }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
             >
               {loading ? "Saving..." : "Save Authority Profile"}
             </button>
           </form>
+          </Card>
         </motion.div>
       </div>
     </div>
