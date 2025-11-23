@@ -18,10 +18,22 @@ PLACE_TYPES = (
 class TouristProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=200)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     phone = models.CharField(max_length=30, blank=True)
     country = models.CharField(max_length=100, blank=True)
+    nationality = models.CharField(max_length=100, blank=True)
+    current_location = models.CharField(max_length=200, blank=True)
+    profile_photo = models.ImageField(upload_to='tourist_photos/', blank=True, null=True)
     blockchain_id = models.CharField(max_length=200, blank=True)
+    # Travel Details
+    from_address = models.TextField(blank=True)  # Origin
+    to_address = models.TextField(blank=True)  # Destination
+    arrival_date = models.DateField(null=True, blank=True)
+    departure_date = models.DateField(null=True, blank=True)
+    hotel_name = models.CharField(max_length=200, blank=True)
+    hotel_address = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -78,3 +90,33 @@ class Incident(models.Model):
 
     def __str__(self):
         return f"{self.title} @ {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+
+
+# -----------------------------------------
+# Authority Profile
+# -----------------------------------------
+AGENCY_TYPES = (
+    ('police', 'Police'),
+    ('hospital', 'Hospital/Medical'),
+    ('embassy', 'Embassy'),
+    ('fire', 'Fire Department'),
+    ('tourism', 'Tourism Authority'),
+    ('emergency', 'Emergency Services'),
+    ('other', 'Other'),
+)
+
+
+class AuthorityProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    full_name = models.CharField(max_length=200)
+    official_email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=30, blank=True)  # Official phone number
+    agency_type = models.CharField(max_length=50, choices=AGENCY_TYPES)
+    agency_name = models.CharField(max_length=200)
+    authority_id = models.CharField(max_length=100, unique=True)  # Badge number / Officer ID
+    is_verified = models.BooleanField(default=False)  # Admin verification required
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.full_name} - {self.agency_name}"

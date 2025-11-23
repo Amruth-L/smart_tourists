@@ -67,7 +67,7 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],  # For serving React app
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -141,6 +141,11 @@ USE_TZ = True
 # -----------------------------
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Frontend static files (built React app)
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # Built frontend files
+]
 
 
 # -----------------------------

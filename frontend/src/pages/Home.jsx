@@ -1,14 +1,14 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-export default function Home() {
+export default function Home({ setPlaceType, setRoute }) {
   return (
     <div className="w-full min-h-screen bg-black text-white overflow-x-hidden">
 
       {/* HERO SECTION */}
       <section className="relative h-screen w-full overflow-hidden">
         <img
-          src="bhoo.webp"
+          src="/static/bhoo.webp"
           alt="Hero"
           className="absolute inset-0 w-full h-full object-cover opacity-70"
         />
@@ -95,7 +95,7 @@ export default function Home() {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {["/place1.jpg", "/place2.jpg", "/place3.jpg"].map((src, i) => (
+          {["/static/images/place1.jpg", "/static/images/place2.jpg", "/static/images/place3.jpg"].map((src, i) => (
             <motion.img
               key={i}
               src={src}
