@@ -32,7 +32,9 @@ function MapUpdater({ center }) {
     return null
 }
 
-export default function Dashboard({ userId, userType }) {
+export default function Dashboard() {
+    const userId = localStorage.getItem('userId')
+    const userType = localStorage.getItem('userType')
     const [markers, setMarkers] = React.useState([])
     const [liveLocation, setLiveLocation] = React.useState(null)
     const [center, setCenter] = React.useState([12.9716, 77.5946])

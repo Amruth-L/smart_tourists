@@ -1,37 +1,36 @@
 import React from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
+import Alerts from "./pages/Alerts";
+import Auth from "./pages/Auth";
+import AuthorityProfileDetail from "./pages/AuthorityProfileDetail";
 import Dashboard from "./pages/Dashboard";
 import EmergencyContacts from "./pages/EmergencyContacts";
-import TouristID from "./pages/TouristID";
-import Alerts from "./pages/Alerts";
+import Home from "./pages/Home";
 import MapView from "./pages/MapView";
-import Auth from "./pages/Auth";
+import TouristID from "./pages/TouristID";
 import TouristProfileDetail from "./pages/TouristProfileDetail";
-import AuthorityProfileDetail from "./pages/AuthorityProfileDetail";
 
 export default function App() {
-  const [route, setRoute] = React.useState("home");
-  const [placeType, setPlaceType] = React.useState(null);
-  const [userId, setUserId] = React.useState(null);
-  const [userType, setUserType] = React.useState(null);
-
   return (
-    <div className="min-h-screen bg-slate-50">
-      {route !== "auth" && route !== "login" && route !== "tourist-profile" && route !== "authority-profile" && route !== "dashboard" && <Navbar setRoute={setRoute} />}
-
-      <div className={`container mx-auto p-6 ${route !== "dashboard" ? "pt-24" : ""}`}>
-        {route === "home" && <Home setPlaceType={setPlaceType} setRoute={setRoute} />}
-        {route === "dashboard" && <Dashboard userId={userId} userType={userType} />}
-        {route === "contacts" && <EmergencyContacts />}
-        {route === "id" && <TouristID />}
-        {route === "alerts" && <Alerts />}
-        {route === "map" && <MapView placeType={placeType} />}
-        {route === "auth" && <Auth setRoute={setRoute} setUserId={setUserId} setUserType={setUserType} />}
-        {route === "login" && <Auth setRoute={setRoute} setUserId={setUserId} setUserType={setUserType} />}
-        {route === "tourist-profile" && <TouristProfileDetail userId={userId} onComplete={() => setRoute("dashboard")} />}
-        {route === "authority-profile" && <AuthorityProfileDetail userId={userId} onComplete={() => setRoute("dashboard")} />}
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <Navbar />
+      <main className="pt-20">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/contacts" element={<EmergencyContacts />} />
+          <Route path="/id" element={<TouristID />} />
+          <Route path="/alerts" element={<Alerts />} />
+          <Route path="/map" element={<MapView />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/login" element={<Auth />} />
+          <Route path="/tourist-profile" element={<TouristProfileDetail />} />
+          <Route path="/authority-profile" element={<AuthorityProfileDetail />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
     </div>
   );
 }
